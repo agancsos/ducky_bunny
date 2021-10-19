@@ -1,0 +1,25 @@
+REM ###############################################################################
+REM # Title       : Auto-connect RDP for macOS                                    #       
+REM # Author      : Abel Gancsos                                                  #
+REM # Version     : v. 1.0.0.0                                                    #
+REM # Description : Helps to automate starting a macOS RDP session.               #
+REM #-----------------------------------------------------------------------------#
+REM # Green  : Next stage                                                         #
+REM # Yellow : Waiting                                                            #
+REM # Blue   : Active                                                             #
+REM ###############################################################################
+LED STARTUP
+COMMAND SPACE
+STRING Remote Desktop
+ENTER
+COMMAND F
+BACKSPACE
+STRING <update-me>
+TAB
+ENTER
+LED YELLOW 20
+DELAY 20
+LED G
+ENTER
+LED FINISH
+

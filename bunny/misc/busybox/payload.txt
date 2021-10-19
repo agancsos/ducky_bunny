@@ -1,0 +1,30 @@
+#!/bin/bash
+###############################################################################
+# Title       : Make the Bash Bunny act as a busybox                          #       
+# Author      : Abel Gancsos                                                  #
+# Version     : v. 1.0.0.0                                                    #
+# Target      : Unix                                                          #
+# Description : Busybox mode                                                  #
+#-----------------------------------------------------------------------------#
+# Green  : Next stage                                                         #
+# Yellow : Waiting                                                            #
+# Blue   : Active                                                             #
+###############################################################################
+LOOT_PATH=/root/exdisk/loot/busybox
+SOURCE_PATH=
+SOCKET_PORT=33669
+RETAIN_EXDISK=1
+
+LED STARTUP
+ATTACKMODE ECM_ETHERNET
+
+## Stage 1: Mount exdisk
+LED STAGE1
+mount -t msdos -o rw /dev/mmcblk0p1 /root/exdisk
+
+LED ATTACK
+QUACK DELAY 500
+
+LED FINISH
+LED B 50
+

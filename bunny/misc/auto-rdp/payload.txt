@@ -1,0 +1,29 @@
+#!/bin/bash
+###############################################################################
+# Title       : Auto-connect RDP for macOS                                    #       
+# Author      : Abel Gancsos                                                  #
+# Version     : v. 1.0.0.0                                                    #
+# Description : Helps to automate starting a macOS RDP session.               #
+#-----------------------------------------------------------------------------#
+# Green  : Next stage                                                         #
+# Yellow : Waiting                                                            #
+# Blue   : Active                                                             #
+###############################################################################
+SECONDS_WAIT=20
+DESKTOP_NAME=
+LED STARTUP
+ATTACKMODE HID STORAGE
+QUACK COMMAND SPACE
+QUACK STRING Remote Desktop
+QUACK ENTER
+QUACK COMMAND F
+QUACK BACKSPACE
+QUACK STRING $DESKTOP_NAME
+QUACK TAB
+QUACK ENTER
+LED YELLOW 20
+QUACK DELAY $SECONDS_WAIT
+LED G
+QUACK ENTER
+LED B
+

@@ -1,0 +1,16 @@
+REM ##############################################################################
+REM # Title       : christmastree.txt                                            #
+REM # Author      : Abel Gancsos                                                 #
+REM # Version     : v. 1.0.0.0                                                   #
+REM # Description : Spread the Christmas cheer with Rubber Ducky.                #
+REM ##############################################################################
+
+REM Open https://www.youtube.com/watch?v=j5ceLMPlqnA in Chrome
+REM Minimize the Chrome window
+
+REM Start the light show
+LED R
+LED G
+LED B
+LED W
+
