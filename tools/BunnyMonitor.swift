@@ -12,7 +12,6 @@ class BunnyMonitor {
 	public init() {
 	}
 
-	/// Decrypts files for use
 	@objc func onWake(note: NSNotification) {
 		if (!self.safeMode) {
 			self.iolock = true;
@@ -21,7 +20,6 @@ class BunnyMonitor {
 		}
 	}
 
-	/// Encrypts files for protection
 	@objc func onSleep(note: NSNotification) {
 		if (!self.safeMode) {
 			self.iolock = true;
@@ -77,3 +75,4 @@ for i : Int in 0..<CommandLine.arguments.count {
 }
 watcher.watch();	
 RunLoop.current.run();
+
