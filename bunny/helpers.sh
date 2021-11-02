@@ -9,10 +9,9 @@
 
 BASH_RUN() {
 	local platform=$1
-	shift
 	local delay=$2
 	local keyboard_delay=500
-	shift
+	shift 2
 
 	case "$platform" in
 		"WIN")
@@ -47,11 +46,39 @@ BASH_RUN() {
 	esac
 }
 
+BUNNY_RUN() {
+	BASH_RUN "$@"
+}
+
 BUNNY_LOG() {
 	local log_path=$1
 	shift
 	echo "$(date) $@" >> "$log_path"
 }
 
+BUNNY_GET() {
+	local var=$1
+	local target=$2
+	shift 2
+	case "$var" in 
+		"TARGET_OS") 
+			raw_os=`nmap -T4 -O "$target" -sS | grep -i running:`
+			if [[ "$raw_os" == *"Apple"* ]]; then
+    			export "$var"= "mac"
+			elif [[ "$raw_os" == *"Linux"* ]]; then
+    			export "$var"="linux"
+			elif [[ "$raw_os" == *"Microsoft"* ]]; then
+				export "$var"="win"
+			else
+				export "$var"="NA"
+			fi ;;
+		*) ;;
+	esac
+}
+
+
 export -f BUNNY_LOG
 export -f BASH_RUN
+export -f BUNNY_RUN
+export -f BUNNY_GET
+
