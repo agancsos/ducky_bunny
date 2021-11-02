@@ -1,0 +1,31 @@
+#!/bin/bash
+###############################################################################
+# Title       : KillSwitch                                                    #       
+# Author      : Abel Gancsos                                                  #
+# Version     : v. 1.0.0.0                                                    #
+# Target      : Bash Bunny                                                    #
+# Description : Removes files in the event the Bash Bunny needs to be dropped.#
+# It is extremely important to make a backup of the Bash Bunny during arming. #
+#-----------------------------------------------------------------------------#
+# Green  : Next stage                                                         #
+# Yellow : Waiting                                                            #
+# Blue   : Active                                                             #
+###############################################################################
+function purge_remaining {
+	find /root/udisk -type d -not -path "." -not -path ".." -exec rm -fr {} \;
+	udisk unmount
+}
+
+LED STARTUP
+ATTACKMODE SERIAL
+NAME=killswitch
+LOOT_PATH="/root/udisk"
+udisk mount
+
+LED CLEANUP
+find /root/udisk -type f -not -path "$0" -exec rm -f {} \;
+	
+LED FINISH
+LED B 20
+trap purge_remaining EXIT
+
