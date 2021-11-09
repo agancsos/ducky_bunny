@@ -50,17 +50,165 @@ type Encoder struct {
 	keycodeMap            map[string]string
 	debug                 bool
 	generate              bool
+	encodedScript         []byte
+	keyboardLayout        map[string]string
 }
 func NewEncoder(params map[string]string) *Encoder {
 	var instance = &Encoder{};
 	instance.inputFilePath = "./payload.txt";
 	instance.outputFilePath = "./inject.bin";
+	instance.encodedScript = []byte {};
 	instance.debug = false;
 	if params["-i"] != "" { instance.inputFilePath = params["-i"]; }
 	if params["-o"] != "" { instance.outputFilePath = params["-o"]; }
 	if params["-l"] != "" { instance.keyboardFilePath = params["-l"]; }
 	_, instance.debug = params["--debug"];
 	_, instance.generate = params["--gen"];
+	instance.keyboardLayout = map[string]string {
+		"MODIFIERKEY_CTRL"          :  "0x01",
+		"MODIFIERKEY_SHIFT"         :  "0x02",
+		"MODIFIERKEY_ALT"           :  "0x04",
+		"MODIFIERKEY_GUI"           :  "0x08",
+		"MODIFIERKEY_LEFT_CTRL"     :  "0x01",
+		"MODIFIERKEY_LEFT_SHIFT"    :  "0x02",
+		"MODIFIERKEY_LEFT_ALT"      :  "0x04",
+		"MODIFIERKEY_LEFT_GUI"      :  "0x08",
+		"MODIFIERKEY_RIGHT_CTRL"    :  "0x10",
+		"MODIFIERKEY_RIGHT_SHIFT"   :  "0x20",
+		"MODIFIERKEY_RIGHT_ALT"     :  "0x40",
+		"MODIFIERKEY_RIGHT_GUI"     :  "0x80",
+		"KEY_MEDIA_VOLUME_INC"      :  "0x80",
+		"KEY_MEDIA_VOLUME_DEC"      :  "0x81",
+		"KEY_MEDIA_MUTE"            :  "0x7F",
+		"KEY_MEDIA_PLAY_PAUSE"      :  "0x08",
+		"KEY_MEDIA_NEXT_TRACK"      :  "0x10",
+		"KEY_MEDIA_PREV_TRACK"      :  "0x20",
+		"KEY_MEDIA_STOP"            :  "0x40",
+		"KEY_MEDIA_EJECT"           :  "0x80",
+		"KEY_A"                     :  "4",
+		"KEY_B"                     :  "5",
+		"KEY_C"                     :  "6",
+		"KEY_D"                     :  "7",
+		"KEY_E"                     :  "8",
+		"KEY_F"                     :  "9",
+		"KEY_G"                     :  "10",
+		"KEY_H"                     :  "11",
+		"KEY_I"                     :  "12",
+		"KEY_J"                     :  "13",
+		"KEY_K"                     :  "14",
+		"KEY_L"                     :  "15",
+		"KEY_M"                     :  "16",
+		"KEY_N"                     :  "17",
+		"KEY_O"                     :  "18",
+		"KEY_P"                     :  "19",
+		"KEY_Q"                     :  "20",
+		"KEY_R"                     :  "21",
+		"KEY_S"                     :  "22",
+		"KEY_T"                     :  "23",
+		"KEY_U"                     :  "24",
+		"KEY_V"                     :  "25",
+		"KEY_W"                     :  "26",
+		"KEY_X"                     :  "27",
+		"KEY_Y"                     :  "28",
+		"KEY_Z"                     :  "29",
+		"KEY_1"                     :  "30",
+		"KEY_2"                     :  "31",
+		"KEY_3"                     :  "32",
+		"KEY_4"                     :  "33",
+		"KEY_5"                     :  "34",
+		"KEY_6"                     :  "35",
+		"KEY_7"                     :  "36",
+		"KEY_8"                     :  "37",
+		"KEY_9"                     :  "38",
+		"KEY_0"                     :  "39",
+		"KEY_ENTER"                 :  "40",
+		"KEY_ESC"                   :  "41",
+		"KEY_BACKSPACE"             :  "42",
+		"KEY_TAB"                   :  "43",
+		"KEY_SPACE"                 :  "44",
+		"KEY_MINUS"                 :  "45",
+		"KEY_EQUAL"                 :  "46",
+		"KEY_LEFT_BRACE"            :  "47",
+		"KEY_RIGHT_BRACE"           :  "48",
+		"KEY_BACKSLASH"             :  "49",
+		"KEY_NON_US_NUM"            :  "50",
+		"KEY_SEMICOLON"             :  "51",
+		"KEY_QUOTE"                 :  "52",
+		"KEY_TILDE"                 :  "53",
+		"KEY_COMMA"                 :  "54",
+		"KEY_PERIOD"                :  "55",
+		"KEY_SLASH"                 :  "56",
+		"KEY_CAPS_LOCK"             :  "57",
+		"KEY_F1"                    :  "58",
+		"KEY_F2"                    :  "59",
+		"KEY_F3"                    :  "60",
+		"KEY_F4"                    :  "61",
+		"KEY_F5"                    :  "62",
+		"KEY_F6"                    :  "63",
+		"KEY_F7"                    :  "64",
+		"KEY_F8"                    :  "65",
+		"KEY_F9"                    :  "66",
+		"KEY_F10"                   :  "67",
+		"KEY_F11"                   :  "68",
+		"KEY_F12"                   :  "69",
+		"KEY_PRINTSCREEN"           :  "70",
+		"KEY_SCROLL_LOCK"           :  "71",
+		"KEY_PAUSE"                 :  "72",
+		"KEY_INSERT"                :  "73",
+		"KEY_HOME"                  :  "74",
+		"KEY_PAGEUP"                :  "75",
+		"KEY_DELETE"                :  "76",
+		"KEY_END"                   :  "77",
+		"KEY_PAGEDOWN"              :  "78",
+		"KEY_RIGHT"                 :  "79",
+		"KEY_LEFT"                  :  "80",
+		"KEY_DOWN"                  :  "81",
+		"KEY_UP"                    :  "82",
+		"KEY_NUM_LOCK"              :  "83",
+		"KEYPAD_SLASH"              :  "84",
+		"KEYPAD_ASTERIX"            :  "85",
+		"KEYPAD_MINUS"              :  "86",
+		"KEYPAD_PLUS"               :  "87",
+		"KEYPAD_ENTER"              :  "88",
+		"KEYPAD_EQUALS"             :  "103",
+		"KEYPAD_1"                  :  "89",
+		"KEYPAD_2"                  :  "90",
+		"KEYPAD_3"                  :  "91",
+		"KEYPAD_4"                  :  "92",
+		"KEYPAD_5"                  :  "93",
+		"KEYPAD_6"                  :  "94",
+		"KEYPAD_7"                  :  "95",
+		"KEYPAD_8"                  :  "96",
+		"KEYPAD_9"                  :  "97",
+		"KEYPAD_0"                  :  "98",
+		"KEYPAD_PERIOD"             :  "99",
+		"KEY_APP"                   :  "0x65",
+		"KEY_POWER"                 :  "0x66",
+		"KEY_EXE"                   :  "0x74",
+		"KEY_HELP"                  :  "0x75",
+		"KEY_MENU"                  :  "0x76",
+		"KEY_SELECT"                :  "0x77",
+		"KEY_STOP"                  :  "0x78",
+		"KEY_AGAIN"                 :  "0x79",
+		"KEY_UNDO"                  :  "0x7A",
+		"KEY_CUT"                   :  "0x7B",
+		"KEY_COPY"                  :  "0x7C",
+		"KEY_PASTE"                 :  "0x7D",
+		"KEY_FIND"                  :  "0x7E",
+		"KEY_SYSTEM_POWER"          :  "0x81",
+		"KEY_SYSTEM_SLEEP"          :  "0x82",
+		"KEY_SYSTEM_WAKE"           :  "0x83",
+		"KEYPAD_PIPE"               :  "0xC9",
+		"KEY_LEFT_CTRL"             :  "0xE0",
+		"KEY_LEFT_SHIFT"            :  "0xE1",
+		"KEY_LEFT_ALT"              :  "0xE2",
+		"KEY_LEFT_GUI"              :  "0xE3",
+		"KEY_COMMAND"               :  "0xE3",
+		"KEY_RIGHT_CTRL"            :  "0xE4",
+		"KEY_RIGHT_SHIFT"           : "0xE5",
+		"KEY_RIGHT_ALT"             :  "0xE6",
+		"KEY_RIGHT_GUI"             :  "0xE7",
+	};
 	instance.keycodeMap = map[string]string {
 		"KEY_SPACE"                          : "ASCII_20",
 		"KEY_1, MODIFIERKEY_SHIFT"           : "ASCII_21",
@@ -162,9 +310,195 @@ func NewEncoder(params map[string]string) *Encoder {
 	if instance.keyboardFilePath != "" { instance.extractKeycodes(); }
 	return instance;
 }
-func (x Encoder) charToByte(c string) byte {
-	var intVal, _ = strconv.Atoi(c);
-	return byte(intVal);
+func (x Encoder) Encode() {
+	var rawDuckyScript, err = ioutil.ReadFile(x.inputFilePath);
+	var duckyScript = string(rawDuckyScript);
+	if err != nil && !x.debug {
+		println("Failed to read input file...");
+		os.Exit(-2);
+	} else{
+		var duckyLines = strings.Split(duckyScript, "\n");
+		var defaultDelay = true;
+		var defaultDelayOverrideValue = 255;
+		for _, line := range duckyLines {
+			var comps = strings.Split(line, " ");
+
+			// Skips and corrections
+			if  comps[0] == "REM" ||
+				comps[0] == "LED" ||
+				comps[0] == "\n"  ||
+				(len(comps) > 1 && comps[0][0:2] == "//") { continue; }
+			if x.debug { println(line); }
+
+			// Encode line
+			var command = "";
+			if len(comps) > 1 {
+				command = strings.Trim(strings.Join(comps[1:], " "), "");
+			} else { 
+				command = strings.Trim(comps[0], " "); 
+			}
+			switch (strings.Trim(comps[0], " ")) {
+				case "DEFAULT_DELAY", "DEFAULTDELAY":
+					defaultDelay = false;
+					defaultDelayOverrideValue, _ = strconv.Atoi(command);
+					break;
+				case "DELAY":
+					defaultDelay = false;
+					var delayValue, _ = strconv.Atoi(command);
+					x.injectDelay(delayValue);
+					break;
+				case "STRING":
+					for _, c := range command { 
+						x.addBytes(x.charToBytes(string(c))); 
+					}
+					break;
+				case "STRING_DELAY":
+					var delayValue, _ = strconv.Atoi(comps[1]);
+					for _, c := range comps[2] {
+						x.addBytes(x.charToBytes(string(c)));
+						x.injectDelay(delayValue);
+					}
+					break;
+				case "CONTROL", "CTRL":
+					if len(command) > 1 {
+						x.encodedScript = append(x.encodedScript, x.strInstrToByte(command));
+						x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keycodeMap["MODIFIERKEY_CTRL"]));
+					} else {
+						x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keycodeMap["KEY_LEFT_CTRL"]));
+						x.encodedScript = append(x.encodedScript, byte(0x00));
+					}
+					break;
+				case "ALT":
+                    if len(command) > 1 {
+                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(command));
+                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keycodeMap["MODIFIERKEY_ALT"]));
+                    } else {
+                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keycodeMap["KEY_LEFT_ALT"]));
+                        x.encodedScript = append(x.encodedScript, byte(0x00));
+                    }
+                    break;
+				case "SHIFT":
+                    if len(command) > 1 {
+                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(command));
+                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keycodeMap["MODIFIERKEY_SHIFT"]));
+                    } else {
+                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keycodeMap["KEY_LEFT_SHIFT"]));
+                        x.encodedScript = append(x.encodedScript, byte(0x00));
+                    }
+                    break;
+				case "CTRL-ALT":
+                    if len(command) > 1 {
+                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(command));
+                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keycodeMap["MODIFIERKEY_CTRL"]) | x.strInstrToByte(x.keycodeMap["MODIFIERKEY_ALT"]));
+                    } else { continue; }
+                    break;
+				case "CTRL-SHIFT":
+                    if len(command) > 1 {
+                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(command));
+                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keycodeMap["MODIFIERKEY_CTRL"]) | x.strInstrToByte(x.keycodeMap["MODIFIERKEY_SHIFT"]));
+                    } else { continue; }
+                    break;
+				case "COMMAND-OPTION":
+                    if len(command) > 1 {
+                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(command));
+                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keycodeMap["MODIFIERKEY_KEY_LEFT_GUI"]) | x.strInstrToByte(x.keycodeMap["MODIFIERKEY_ALT"]));
+                    } else { continue; }
+                    break;
+				case "ALT-SHIFT":
+                    if len(command) > 1 {
+                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(command));
+                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keycodeMap["MODIFIERKEY_LEFT_ALT"]) | x.strInstrToByte(x.keycodeMap["MODIFIERKEY_SHIFT"]));
+                    } else {
+						x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keycodeMap["KEY_LEFT_ALT"]));
+						x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keycodeMap["MODIFIERKEY_LEFT_ALT"]) | x.strInstrToByte(x.keycodeMap["MODIFIERKEY_SHIFT"]));
+					}
+                    break;
+				case "ALT-TAB":
+                    if len(command) == 1 {
+                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keycodeMap["KEY_TAB"]));
+						x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keycodeMap["MODIFIERKEY_LEFT_GUI"]));
+                    } else { continue; }
+                    break;
+				case "WINDOWS", "GUI":
+                    if len(command) > 1 {
+                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(command));
+                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keycodeMap["MODIFIERKEY_KEY_LEFT_GUI"]))
+                    } else {
+						x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keycodeMap["MODIFIERKEY_KEY_LEFT_GUI"]));
+						x.encodedScript = append(x.encodedScript, byte(0x00));
+					}
+                    break;
+				case "COMMAND":
+                    if len(command) > 1 {
+                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(command));
+                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keycodeMap["MODIFIERKEY_KEY_LEFT_GUI"]));
+                    } else {
+                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keycodeMap["KEY_COMMAND"]));
+                        x.encodedScript = append(x.encodedScript, byte(0x00));
+                    }
+                    break;
+				default:
+					x.encodedScript = append(x.encodedScript, x.strInstrToByte(strings.Trim(comps[0], " ")));
+					//x.encodedScript = append(x.encodedScript, byte(0x00));
+					break;
+			}
+			if !defaultDelay && defaultDelayOverrideValue > 0 {
+				x.injectDelay(defaultDelayOverrideValue);
+			}
+		}
+
+		// Write final script
+		if x.debug {
+			println(fmt.Sprintf("Encoded script:\n%v", x.encodedScript));
+		} else {
+			var err = ioutil.WriteFile(x.outputFilePath, x.encodedScript, 0777);
+			if err != nil {
+				println("Failed to write bin file...");
+				os.Exit(-4);
+			}
+		}
+
+		println("Encoder finished without error.  Please copy inject.bin to Rubber Ducky.");
+	}
+}
+func (x *Encoder) addBytes(a []byte) {
+	for _, b := range a {
+		x.encodedScript = append(x.encodedScript, b);
+	}
+	if len(a) % 2 != 0 {
+		x.encodedScript = append(x.encodedScript, byte(0x00));
+	}
+}
+func (x *Encoder) injectDelay(a int) {
+	var delayValue = a;
+	for ; delayValue > 0; {
+		x.encodedScript = append(x.encodedScript, byte(0x00));
+		if (delayValue > 255) {
+			x.encodedScript = append(x.encodedScript, byte(0xFF));
+			delayValue -= 255;
+		} else {
+			x.encodedScript = append(x.encodedScript, byte(delayValue));
+			delayValue = 0;
+		}
+	}
+}
+func (x Encoder) charToBytes(c string) []byte {
+	return x.codeToBytes(c);
+}
+func (x Encoder) codeToBytes(a string) []byte {
+	var result = []byte {};
+	for _, b := range a {
+		if x.keyboardLayout["KEY_" + string(b)] != "" {
+			for _, c := range strings.Split(x.keyboardLayout["KEY_" + string(b)], ",") {
+				result = append(result, x.strToByte(c));
+			}
+		} else if x.keycodeMap[string(b)] != "" {
+			for _, c := range strings.Split(x.keycodeMap[string(b)], ",") {
+				result = append(result, x.strToByte(c));
+			}
+		}
+	}
+	return result;
 }
 func (x Encoder) strToByte(str string) byte {
 	if strings.HasPrefix(str, "0x") {
@@ -175,183 +509,8 @@ func (x Encoder) strToByte(str string) byte {
 		return byte(temp);
 	}
 }
-func (x Encoder) Encode() {
-	var rawDuckyScript, err = ioutil.ReadFile(x.inputFilePath);
-	var duckyScript = string(rawDuckyScript);
-	if err != nil && !x.debug {
-		println("Failed to read input file...");
-		os.Exit(-2);
-	} else{
-		var encodedScript []byte;
-		var duckyLines = strings.Split(duckyScript, "\n");
-		var defaultDelay = true;
-		var defaultDelayOverrideValue = 255;
-		for _, line := range duckyLines {
-			var comps = strings.Split(line, " ");
-
-			// Skips and corrections
-			if comps[0] == "REM" ||
-				comps[0] == "LED"||
-				comps[0] == "\n" { continue; }
-			if x.debug { println(line); }
-
-			// Encode line
-			var command = "";
-			if len(comps) > 1 {
-				command = strings.Trim(comps[1], " ");
-			} else { command = strings.Trim(comps[0], " "); }
-			switch (strings.Trim(comps[0], " ")) {
-				case "DEFAULT_DELAY", "DEFAULTDELAY":
-					defaultDelay = false;
-					defaultDelayOverrideValue, _ = strconv.Atoi(command);
-					break;
-				case "DELAY":
-					defaultDelay = false;
-					var delayValue, _ = strconv.Atoi(command);
-					for ; delayValue > 0; {
-						encodedScript = append(encodedScript, byte(0x00));
-						if (delayValue > 255) {
-							encodedScript = append(encodedScript, byte(0xFF));
-							delayValue -= 255;
-						} else {
-							encodedScript = append(encodedScript, byte(delayValue));
-							delayValue = 0;
-						}
-					}
-					break;
-				case "STRING":
-					for _, c := range command { encodedScript = append(encodedScript, x.charToByte(string(c))); }
-					break;
-				case "STRING_DELAY":
-					var delayValue, _ = strconv.Atoi(comps[1]);
-					for _, c := range comps[2] {
-						encodedScript = append(encodedScript, x.charToByte(string(c)));
-						for ; delayValue > 0; {
-							encodedScript = append(encodedScript, byte(0x00));
-							if (delayValue > 255) {
-								encodedScript = append(encodedScript, byte(0xFF));
-								delayValue -= 255;
-							} else {
-								encodedScript = append(encodedScript, byte(delayValue));
-								delayValue = 0;
-							}
-						}
-					}
-					break;
-				case "CONTROL", "CTRL":
-					if len(command) > 1 {
-						encodedScript = append(encodedScript, x.strInstrToByte(command));
-						encodedScript = append(encodedScript, x.strInstrToByte(x.keycodeMap["MODIFIERKEY_CTRL"]));
-					} else {
-						encodedScript = append(encodedScript, x.strInstrToByte(x.keycodeMap["KEY_LEFT_CTRL"]));
-						encodedScript = append(encodedScript, byte(0x00));
-					}
-					break;
-				case "ALT":
-                    if len(command) > 1 {
-                        encodedScript = append(encodedScript, x.strInstrToByte(command));
-                        encodedScript = append(encodedScript, x.strInstrToByte(x.keycodeMap["MODIFIERKEY_ALT"]));
-                    } else {
-                        encodedScript = append(encodedScript, x.strInstrToByte(x.keycodeMap["KEY_LEFT_ALT"]));
-                        encodedScript = append(encodedScript, byte(0x00));
-                    }
-                    break;
-				case "SHIFT":
-                    if len(command) > 1 {
-                        encodedScript = append(encodedScript, x.strInstrToByte(command));
-                        encodedScript = append(encodedScript, x.strInstrToByte(x.keycodeMap["MODIFIERKEY_SHIFT"]));
-                    } else {
-                        encodedScript = append(encodedScript, x.strInstrToByte(x.keycodeMap["KEY_LEFT_SHIFT"]));
-                        encodedScript = append(encodedScript, byte(0x00));
-                    }
-                    break;
-				case "CTRL-ALT":
-                    if len(command) > 1 {
-                        encodedScript = append(encodedScript, x.strInstrToByte(command));
-                        encodedScript = append(encodedScript, x.strInstrToByte(x.keycodeMap["MODIFIERKEY_CTRL"]) | x.strInstrToByte(x.keycodeMap["MODIFIERKEY_ALT"]));
-                    } else { continue; }
-                    break;
-				case "CTRL-SHIFT":
-                    if len(command) > 1 {
-                        encodedScript = append(encodedScript, x.strInstrToByte(command));
-                        encodedScript = append(encodedScript, x.strInstrToByte(x.keycodeMap["MODIFIERKEY_CTRL"]) | x.strInstrToByte(x.keycodeMap["MODIFIERKEY_SHIFT"]));
-                    } else { continue; }
-                    break;
-				case "COMMAND-OPTION":
-                    if len(command) > 1 {
-                        encodedScript = append(encodedScript, x.strInstrToByte(command));
-                        encodedScript = append(encodedScript, x.strInstrToByte(x.keycodeMap["MODIFIERKEY_KEY_LEFT_GUI"]) | x.strInstrToByte(x.keycodeMap["MODIFIERKEY_ALT"]));
-                    } else { continue; }
-                    break;
-				case "ALT-SHIFT":
-                    if len(command) > 1 {
-                        encodedScript = append(encodedScript, x.strInstrToByte(command));
-                        encodedScript = append(encodedScript, x.strInstrToByte(x.keycodeMap["MODIFIERKEY_LEFT_ALT"]) | x.strInstrToByte(x.keycodeMap["MODIFIERKEY_SHIFT"]));
-                    } else {
-						encodedScript = append(encodedScript, x.strInstrToByte(x.keycodeMap["KEY_LEFT_ALT"]));
-						encodedScript = append(encodedScript, x.strInstrToByte(x.keycodeMap["MODIFIERKEY_LEFT_ALT"]) | x.strInstrToByte(x.keycodeMap["MODIFIERKEY_SHIFT"]));
-					}
-                    break;
-				case "ALT-TAB":
-                    if len(command) == 1 {
-                        encodedScript = append(encodedScript, x.strInstrToByte(x.keycodeMap["KEY_TAB"]));
-						encodedScript = append(encodedScript, x.strInstrToByte(x.keycodeMap["MODIFIERKEY_LEFT_GUI"]));
-                    } else { continue; }
-                    break;
-				case "WINDOWS", "GUI":
-                    if len(command) > 1 {
-                        encodedScript = append(encodedScript, x.strInstrToByte(command));
-                        encodedScript = append(encodedScript, x.strInstrToByte(x.keycodeMap["MODIFIERKEY_KEY_LEFT_GUI"]))
-                    } else {
-						encodedScript = append(encodedScript, x.strInstrToByte(x.keycodeMap["MODIFIERKEY_KEY_LEFT_GUI"]));
-						encodedScript = append(encodedScript, byte(0x00));
-					}
-                    break;
-				case "COMMAND":
-                    if len(command) > 1 {
-                        encodedScript = append(encodedScript, x.strInstrToByte(command));
-                        encodedScript = append(encodedScript, x.strInstrToByte(x.keycodeMap["MODIFIERKEY_KEY_LEFT_GUI"]));
-                    } else {
-                        encodedScript = append(encodedScript, x.strInstrToByte(x.keycodeMap["KEY_COMMAND"]));
-                        encodedScript = append(encodedScript, byte(0x00));
-                    }
-                    break;
-				default:
-					encodedScript = append(encodedScript, x.strToByte(strings.Trim(comps[0], " ")));
-					encodedScript = append(encodedScript, byte(0x00));
-					break;
-			}
-			if !defaultDelay && defaultDelayOverrideValue > 0 {
-				var delayValue = defaultDelayOverrideValue;
-				for ; delayValue > 0; {
-					encodedScript = append(encodedScript, byte(0x00));
-					if (delayValue > 255) {
-						encodedScript = append(encodedScript, byte(0xFF));
-						delayValue -= 255;
-					} else {
-						encodedScript = append(encodedScript, byte(delayValue));
-						delayValue = 0;
-					}
-				}
-			}
-		}
-
-		// Write final script
-		if x.debug {
-			println(fmt.Sprintf("Encoded script:\n%v", encodedScript));
-		} else {
-			var err = ioutil.WriteFile(x.outputFilePath, encodedScript, 0777);
-			if err != nil {
-				println("Failed to write bin file...");
-				os.Exit(-4);
-			}
-		}
-
-		println("Encoder finished without error.  Please copy inject.bin to Rubber Ducky.");
-	}
-}
 func (x Encoder) strInstrToByte(command string) byte {
-	if x.keycodeMap["KEY_" + command] != "" { return x.strToByte(strings.Replace(x.keycodeMap["KEY_" + command], "ASCII_", "", -1)); }
+	if command == "" { return x.strToByte("0x00"); }
 	switch (command) {
 		case "ESCAPE": return x.strInstrToByte("ESC");
 		case "DEL": return x.strInstrToByte("DELETE");
@@ -371,9 +530,26 @@ func (x Encoder) strInstrToByte(command string) byte {
 		case "SCROLLLOCK": return x.strInstrToByte("SCROLL_LOCK");
 		case "NUMLOCK": return x.strInstrToByte("NUM_LOCK");
 		case "CAPSLOCK": return x.strInstrToByte("CAPS_LOCK");
-		default: return x.strToByte(command);
+		default:
+			if x.keyboardLayout[command] != "" {
+				x.addBytes(x.codeToBytes(command));
+				break;
+			}
+			for key, value := range x.keycodeMap {
+				if x.strArrayContains(strings.Split(key, ", "), "KEY_" + string(command[0])) {
+					return x.charToBytes(strings.Replace(value, "ASCII_", "", -1))[0];
+				}
+			}
+			return x.charToBytes(string(command))[0];
+			break;
 	}
-	//return "";
+	return x.strToByte("0x00");
+}
+func (x Encoder) strArrayContains(a []string, b string) bool {
+	for _, value := range a {
+		if value == b { return true; }
+	}
+	return false;
 }
 func (x *Encoder) extractKeycodes() {
 	var rawKeycodes, err = ioutil.ReadFile(x.keyboardFilePath);
@@ -388,8 +564,10 @@ func (x *Encoder) extractKeycodes() {
 				line[:1] == "/" ||
 				len(comps) < 2 { continue; }
 			x.keycodeMap[strings.Trim(strings.Trim(comps[1], "					"), " ")] = strings.Trim(comps[0], " ");
-			if x.generate { println("\"" + strings.Trim(strings.Trim(comps[1], "					"), " ") +
-				"\"        : \"" + strings.Trim(comps[0], " ") + "\","); }
+			if x.generate { 
+				println("\"" + strings.Trim(strings.Trim(comps[1], "					"), " ") +
+				"\"        : \"" + strings.Trim(comps[0], " ") + "\","); 
+			}
 		}
 	}
 }
