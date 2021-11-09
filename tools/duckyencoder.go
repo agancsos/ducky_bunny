@@ -47,9 +47,9 @@ type Encoder struct {
 	inputFilePath		  string
 	outputFilePath		  string
 	keyboardFilePath	  string
-	keycodeMap			  map[string]string
-	debug				  bool
-	generate			  bool
+	keycodeMap	          map[string]string
+	debug			  bool
+	generate		  bool
 	encodedScript		  []byte
 	keyboardLayout		  map[string]string
 }
