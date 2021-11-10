@@ -560,7 +560,6 @@ func (x *Encoder) extractKeycodes() {
 		for _, line := range lines {
 			var comps = strings.Split(line, "=");
 			if line == "\n" ||
-				len(line) == 0 ||
 				line[:1] == "/" ||
 				len(comps) < 2 { continue; }
 			x.keycodeMap[strings.Trim(strings.Trim(comps[1], "					"), " ")] = strings.Trim(comps[0], " ");
