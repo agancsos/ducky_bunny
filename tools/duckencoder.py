@@ -8,7 +8,7 @@
 import os, sys;
 
 class DuckyEncoder:
-	keyboard_file=None;input_file=None;output_file=None;debug=None;encoded_script=None;keycode_map=None;keyboard_layout=None;generate=None;last_command=None;
+	keyboard_file=None;input_file=None;output_file=None;debug=None;encoded_script=None;keycode_map=None;keyboard_layout=None;generate=None;last_command=None;mac_mode=None;
 	def __init__(self, params=dict()):
 		self.last_command = "";
 		self.keyboard_file = params["-l"] if "-l" in params.keys() else "";
@@ -16,6 +16,7 @@ class DuckyEncoder:
 		self.output_file = params["-o"] if "-o" in params.keys() else "./inject.bin";
 		self.debug = True if "--debug" in params.keys() and int(params["--debug"]) > 0 else False;
 		self.generate = True if "--gen" in params.keys() and int(params["--gen"]) > 0 else False;
+		self.mac_mode = True if "--osx" in params.keys() and int(params["--osx"]) > 0 else False;
 		self.encoded_script = bytearray();
 		self.keycode_map = {
 			"KEY_SPACE"						     : "ASCII_20",
@@ -273,13 +274,16 @@ class DuckyEncoder:
 						if (self.generate): print("\"{0}\":\"{1}\",".format(comps[1].strip("					").strip(" ")));
 						line = fh.readline();
 			except Exception: print("Failed to read keyboard file.  Will use default keycode map...");
+	def add_null(self):
+		if (self.mac_mode): self.encoded_script.append(0x02);
+		else: self.encoded_script.append(0x00);
 	def add_bytes(self, b):
 		for x in b: self.encoded_script.append(x);
-		if (len(b) % 2 != 0): self.encoded_script.append(0x00);
+		if (len(b) % 2 != 0): self.add_null();
 	def inject_delay(self, delay):
 		delay_value = delay;
 		while (delay_value != 0):
-			self.encoded_script.append(0x00);
+			self.add_null();
 			if (delay_value > 255): self.encoded_script.append(int(0xFF, 16)); delay_value -= 255;
 			else: self.encoded_script.append(delay_value); delay_value = 0;
 	def char_to_bytes(self, c): return self.code_to_bytes(c);
@@ -356,21 +360,21 @@ class DuckyEncoder:
 								self.encoded_script.append(self.str_instr_to_byte(self.keycode_map["MODIFIERKEY_CTRL"]));
 							else:
 								self.encoded_script.append(self.str_instr_to_byte(self.keycode_map["KEY_LEFT_CTRL"]));
-								self.encoded_script.append(0x00);
+								self.add_null();
 						elif (op == "ALT"):
 							if (len(command) > 1):
 								self.encoded_script.append(self.str_instr_to_byte(command))
 								self.encoded_script.append(self.str_instr_to_byte(self.keycode_map["MODIFIERKEY_ALT"]));
 							else:
 								self.encoded_script.append(self.str_instr_to_byte(self.keycode_map["KEY_LEFT_ALT"]));
-								self.encoded_script.append(0x00);
+								self.add_null();
 						elif (op == "SHIFT"):
 							if (len(command) > 1):
 								self.encoded_script.append(self.str_instr_to_byte(command));
 								self.encoded_script.append(self.str_instr_to_byte(self.keycode_map["MODIFIERKEY_SHIFT"]));
 							else:
 								self.encoded_script.append(self.str_instr_to_byte(self.keycode_map["KEY_LEFT_SHIFT"]));
-								self.encoded_script.append(0x00);
+								self.add_null();
 						elif (op == "CTRL-ALT"):
 							if (len(command) > 1):
 								self.encoded_script.append(self.str_instr_to_byte(command));
@@ -404,14 +408,14 @@ class DuckyEncoder:
 								self.encoded_script.append(self.str_instr_to_byte(self.keycode_map["MODIFIERKEY_LEFT_GUI"]));
 							else: 
 								self.encoded_script.append(self.str_instr_to_byte(self.keycode_map["MODIFIERKEY_LEFT_GUI"]));
-								self.encoded_script.append(0x00);
+								self.add_null();
 						elif (op == "COMMAND"):
 							if (len(command) > 1):
 								self.encoded_script.append(self.str_instr_to_byte(command));
 								self.encoded_script.append(self.str_instr_to_byte(self.keycode_map["MODIFIERKEY_LEFT_GUI"]));
 							else:
 								self.encoded_script.append(self.str_instr_to_byte(self.keycode_map["KEY_COMMAND"]));
-								self.encoded_script.append(0x00);
+								self.add_null();
 						else: self.encoded_script.append(self.str_instr_to_byte(comps[0].strip(" ")));
 						if (not default_delay and default_delay_value > 0): self.inject_delay(default_delay_value);
 					if not repeat: self.last_command = line;
