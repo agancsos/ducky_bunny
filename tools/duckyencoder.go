@@ -51,6 +51,7 @@ type Encoder struct {
 	keycodeMap              map[string]string
 	debug                   bool
 	generate                bool
+    macMode                 bool
 	encodedScript           []byte
 	keyboardLayout          map[string]string
 }
@@ -65,6 +66,7 @@ func NewEncoder(params map[string]string) *Encoder {
 	if params["-l"] != "" { instance.keyboardFilePath = params["-l"]; }
 	_, instance.debug = params["--debug"];
 	_, instance.generate = params["--gen"];
+    _, instance.macMode = params["--osx"];
 	instance.keyboardLayout = map[string]string {
 	    "MODIFIERKEY_CTRL"             :  "0x01",
 	    "MODIFIERKEY_SHIFT"            :  "0x02",
@@ -375,7 +377,7 @@ func (x Encoder) Encode() {
 	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keycodeMap["MODIFIERKEY_CTRL"]));
 	                    } else {
 	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keycodeMap["KEY_LEFT_CTRL"]));
-	                        x.encodedScript = append(x.encodedScript, byte(0x00));
+                            x.addNull();
 	                    }
 	                    break;
 	                case "ALT":
@@ -384,7 +386,7 @@ func (x Encoder) Encode() {
 	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keycodeMap["MODIFIERKEY_ALT"]));
 	                    } else {
 	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keycodeMap["KEY_LEFT_ALT"]));
-	                        x.encodedScript = append(x.encodedScript, byte(0x00));
+                            x.addNull();
 	                    }
 	                    break;
 	                case "SHIFT":
@@ -393,7 +395,7 @@ func (x Encoder) Encode() {
 	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keycodeMap["MODIFIERKEY_SHIFT"]));
 	                    } else {
 	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keycodeMap["KEY_LEFT_SHIFT"]));
-	                        x.encodedScript = append(x.encodedScript, byte(0x00));
+                            x.addNull();
 	                    }
 	                    break;
 	                case "CTRL-ALT":
@@ -435,7 +437,7 @@ func (x Encoder) Encode() {
 	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keycodeMap["MODIFIERKEY_KEY_LEFT_GUI"]))
 	                    } else {
 	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keycodeMap["MODIFIERKEY_KEY_LEFT_GUI"]));
-	                        x.encodedScript = append(x.encodedScript, byte(0x00));
+                            x.addNull();
 	                    }
 	                    break;
 	                case "COMMAND":
@@ -444,7 +446,7 @@ func (x Encoder) Encode() {
 	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keycodeMap["MODIFIERKEY_KEY_LEFT_GUI"]));
 	                    } else {
 	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keycodeMap["KEY_COMMAND"]));
-	                        x.encodedScript = append(x.encodedScript, byte(0x00));
+                            x.addNull();
 	                    }
 	                    break;
 	                default:
@@ -473,18 +475,25 @@ func (x Encoder) Encode() {
 	    println("Encoder finished without error.  Please copy inject.bin to Rubber Ducky.");
 	}
 }
+func (x *Encoder) addNull() {
+    if x.macMode {
+        x.encodedScript = append(x.encodedScript, byte(0x02));
+    } else {
+          x.encodedScript = append(x.encodedScript, byte(0x00));
+    }
+}
 func (x *Encoder) addBytes(a []byte) {
 	for _, b := range a {
 	    x.encodedScript = append(x.encodedScript, b);
 	}
 	if len(a) % 2 != 0 {
-	    x.encodedScript = append(x.encodedScript, byte(0x00));
+        x.addNull();
 	}
 }
 func (x *Encoder) injectDelay(a int) {
 	var delayValue = a;
 	for ; delayValue > 0; {
-	    x.encodedScript = append(x.encodedScript, byte(0x00));
+        x.addNull();
 	    if (delayValue > 255) {
 	        x.encodedScript = append(x.encodedScript, byte(0xFF));
 	        delayValue -= 255;
