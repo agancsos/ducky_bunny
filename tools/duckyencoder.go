@@ -51,7 +51,7 @@ type Encoder struct {
 	keycodeMap              map[string]string
 	debug                   bool
 	generate                bool
-    macMode                 bool
+	macMode                 bool
 	encodedScript           []byte
 	keyboardLayout          map[string]string
 }
@@ -66,7 +66,7 @@ func NewEncoder(params map[string]string) *Encoder {
 	if params["-l"] != "" { instance.keyboardFilePath = params["-l"]; }
 	_, instance.debug = params["--debug"];
 	_, instance.generate = params["--gen"];
-    _, instance.macMode = params["--osx"];
+	_, instance.macMode = params["--osx"];
 	instance.keyboardLayout = map[string]string {
 	    "MODIFIERKEY_CTRL"             :  "0x01",
 	    "MODIFIERKEY_SHIFT"            :  "0x02",
@@ -374,79 +374,79 @@ func (x Encoder) Encode() {
 	                case "CONTROL", "CTRL":
 	                    if len(command) > 1 {
 	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(command));
-	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keycodeMap["MODIFIERKEY_CTRL"]));
+	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keyboardLayout["MODIFIERKEY_CTRL"]));
 	                    } else {
-	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keycodeMap["KEY_LEFT_CTRL"]));
-                            x.addNull();
+	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keyboardLayout["KEY_LEFT_CTRL"]));
+							x.addNull();
 	                    }
 	                    break;
 	                case "ALT":
 	                    if len(command) > 1 {
 	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(command));
-	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keycodeMap["MODIFIERKEY_ALT"]));
+	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keyboardLayout["MODIFIERKEY_ALT"]));
 	                    } else {
-	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keycodeMap["KEY_LEFT_ALT"]));
-                            x.addNull();
+	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keyboardLayout["KEY_LEFT_ALT"]));
+							x.addNull();
 	                    }
 	                    break;
 	                case "SHIFT":
 	                    if len(command) > 1 {
 	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(command));
-	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keycodeMap["MODIFIERKEY_SHIFT"]));
+	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keyboardLayout["MODIFIERKEY_SHIFT"]));
 	                    } else {
-	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keycodeMap["KEY_LEFT_SHIFT"]));
-                            x.addNull();
+	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keyboardLayout["KEY_LEFT_SHIFT"]));
+							x.addNull();
 	                    }
 	                    break;
 	                case "CTRL-ALT":
 	                    if len(command) > 1 {
 	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(command));
-	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keycodeMap["MODIFIERKEY_CTRL"]) | x.strInstrToByte(x.keycodeMap["MODIFIERKEY_ALT"]));
+	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keyboardLayout["MODIFIERKEY_CTRL"]) | x.strInstrToByte(x.keyboardLayout["MODIFIERKEY_ALT"]));
 	                    } else { continue; }
 	                    break;
 	                case "CTRL-SHIFT":
 	                    if len(command) > 1 {
 	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(command));
-	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keycodeMap["MODIFIERKEY_CTRL"]) | x.strInstrToByte(x.keycodeMap["MODIFIERKEY_SHIFT"]));
+	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keyboardLayout["MODIFIERKEY_CTRL"]) | x.strInstrToByte(x.keyboardLayout["MODIFIERKEY_SHIFT"]));
 	                    } else { continue; }
 	                    break;
 	                case "COMMAND-OPTION":
 	                    if len(command) > 1 {
 	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(command));
-	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keycodeMap["MODIFIERKEY_KEY_LEFT_GUI"]) | x.strInstrToByte(x.keycodeMap["MODIFIERKEY_ALT"]));
+	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keyboardLayout["MODIFIERKEY_LEFT_GUI"]) | x.strInstrToByte(x.keyboardLayout["MODIFIERKEY_ALT"]));
 	                    } else { continue; }
 	                    break;
 	                case "ALT-SHIFT":
 	                    if len(command) > 1 {
 	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(command));
-	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keycodeMap["MODIFIERKEY_LEFT_ALT"]) | x.strInstrToByte(x.keycodeMap["MODIFIERKEY_SHIFT"]));
+	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keyboardLayout["MODIFIERKEY_LEFT_ALT"]) | x.strInstrToByte(x.keyboardLayout["MODIFIERKEY_SHIFT"]));
 	                    } else {
-	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keycodeMap["KEY_LEFT_ALT"]));
-	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keycodeMap["MODIFIERKEY_LEFT_ALT"]) | x.strInstrToByte(x.keycodeMap["MODIFIERKEY_SHIFT"]));
+	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keyboardLayout["KEY_LEFT_ALT"]));
+	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keyboardLayout["MODIFIERKEY_LEFT_ALT"]) | x.strInstrToByte(x.keyboardLayout["MODIFIERKEY_SHIFT"]));
 	                    }
 	                    break;
 	                case "ALT-TAB":
 	                    if len(command) == 1 {
-	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keycodeMap["KEY_TAB"]));
-	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keycodeMap["MODIFIERKEY_LEFT_GUI"]));
+	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keyboardLayout["KEY_TAB"]));
+	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keyboardLayout["MODIFIERKEY_LEFT_GUI"]));
 	                    } else { continue; }
 	                    break;
 	                case "WINDOWS", "GUI":
 	                    if len(command) > 1 {
 	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(command));
-	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keycodeMap["MODIFIERKEY_KEY_LEFT_GUI"]))
+	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keyboardLayout["MODIFIERKEY_LEFT_GUI"]))
 	                    } else {
-	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keycodeMap["MODIFIERKEY_KEY_LEFT_GUI"]));
-                            x.addNull();
+	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keyboardLayout["MODIFIERKEY_LEFT_GUI"]));
+							x.addNull();
 	                    }
 	                    break;
 	                case "COMMAND":
 	                    if len(command) > 1 {
 	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(command));
-	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keycodeMap["MODIFIERKEY_KEY_LEFT_GUI"]));
+	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keyboardLayout["MODIFIERKEY_LEFT_GUI"]));
 	                    } else {
-	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keycodeMap["KEY_COMMAND"]));
-                            x.addNull();
+	                        x.encodedScript = append(x.encodedScript, x.strInstrToByte(x.keyboardLayout["KEY_COMMAND"]));
+							x.addNull();
 	                    }
 	                    break;
 	                default:
@@ -476,24 +476,24 @@ func (x Encoder) Encode() {
 	}
 }
 func (x *Encoder) addNull() {
-    if x.macMode {
-        x.encodedScript = append(x.encodedScript, byte(0x02));
-    } else {
-          x.encodedScript = append(x.encodedScript, byte(0x00));
-    }
+	if x.macMode {
+		x.encodedScript = append(x.encodedScript, byte(0x02));
+	} else {
+		x.encodedScript = append(x.encodedScript, byte(0x00));
+	}
 }
 func (x *Encoder) addBytes(a []byte) {
 	for _, b := range a {
 	    x.encodedScript = append(x.encodedScript, b);
 	}
 	if len(a) % 2 != 0 {
-        x.addNull();
+		x.addNull();
 	}
 }
 func (x *Encoder) injectDelay(a int) {
 	var delayValue = a;
 	for ; delayValue > 0; {
-        x.addNull();
+		x.addNull();
 	    if (delayValue > 255) {
 	        x.encodedScript = append(x.encodedScript, byte(0xFF));
 	        delayValue -= 255;

@@ -16,7 +16,7 @@ class DuckyEncoder:
 		self.output_file = params["-o"] if "-o" in params.keys() else "./inject.bin";
 		self.debug = True if "--debug" in params.keys() and int(params["--debug"]) > 0 else False;
 		self.generate = True if "--gen" in params.keys() and int(params["--gen"]) > 0 else False;
-		self.mac_mode = True if "--osx" in params.keys() and int(params["--osx"]) > 0 else False;
+		self.mac_mode = True if "--osx" in params.keys() and int(params["--osx"]) > 0 else False
 		self.encoded_script = bytearray();
 		self.keycode_map = {
 			"KEY_SPACE"						     : "ASCII_20",
@@ -276,7 +276,7 @@ class DuckyEncoder:
 			except Exception: print("Failed to read keyboard file.  Will use default keycode map...");
 	def add_null(self):
 		if (self.mac_mode): self.encoded_script.append(0x02);
-		else: self.encoded_script.append(0x00);
+		else: self.encoded_script.append(0x00)
 	def add_bytes(self, b):
 		for x in b: self.encoded_script.append(x);
 		if (len(b) % 2 != 0): self.add_null();
@@ -300,24 +300,24 @@ class DuckyEncoder:
 		if "0x" in a: return int(a.replace("0x", "", 16));  
 		else: return int(a); 
 	def str_instr_to_byte(self, command):
-		if (command == "ESCAPE"): return self.sstr_instr_to_byte("ESC");
-		elif (command == "DEL"): return self.sstr_instr_to_byte("DELETE");
-		elif (command == "BREAK"): return self.sstr_instr_to_byte("PAUSE");
-		elif (command == "CONTROL"): return self.sstr_instr_to_byte("CTRL");
-		elif (command == "DOWNARROW"): return self.sstr_instr_to_byte("DOWN");
-		elif (command == "UPARROW"): return self.sstr_instr_to_byte("UP");
-		elif (command == "LEFTARROW"): return self.sstr_instr_to_byte("LEFT");
-		elif (command == "RIGHTARROW"): return self.sstr_instr_to_byte("RIGHT");
-		elif (command == "MENU"): return self.sstr_instr_to_byte("APP");
-		elif (command == "WINDOWS"): return self.sstr_instr_to_byte("GUI");
-		elif (command == "PLAY" or command == "PAUSE"): return self.sstr_instr_to_byte("MEDIA_PLAY_PAUSE");
-		elif (command == "STOP"): return self.sstr_instr_to_byte("MEDIA_STOP");
-		elif (command == "MUTE"): return self.sstr_instr_to_byte("MEDIA_MUTE");
-		elif (command == "VOLUMEUP"): return self.sstr_instr_to_byte("MEDIA_VOLUME_INC");
-		elif (command == "VOLUMEDOWN"): return self.sstr_instr_to_byte("MEDIA_VOLUME_DEC");
-		elif (command == "SCROLLLOCK"): return self.sstr_instr_to_byte("SCROLL_LOCK");
-		elif (command == "NUMLOCK"): return self.sstr_instr_to_byte("NUM_LOCK");
-		elif (command == "CAPSLOCK"): return self.sstr_instr_to_byte("CAPS_LOCK");
+		if (command == "ESCAPE"): return self.str_instr_to_byte("ESC");
+		elif (command == "DEL"): return self.str_instr_to_byte("DELETE");
+		elif (command == "BREAK"): return self.str_instr_to_byte("PAUSE");
+		elif (command == "CONTROL"): return self.str_instr_to_byte("CTRL");
+		elif (command == "DOWNARROW"): return self.str_instr_to_byte("DOWN");
+		elif (command == "UPARROW"): return self.str_instr_to_byte("UP");
+		elif (command == "LEFTARROW"): return self.str_instr_to_byte("LEFT");
+		elif (command == "RIGHTARROW"): return self.str_instr_to_byte("RIGHT");
+		elif (command == "MENU"): return self.str_instr_to_byte("APP");
+		elif (command == "WINDOWS"): return self.str_instr_to_byte("GUI");
+		elif (command == "PLAY" or command == "PAUSE"): return self.str_instr_to_byte("MEDIA_PLAY_PAUSE");
+		elif (command == "STOP"): return self.str_instr_to_byte("MEDIA_STOP");
+		elif (command == "MUTE"): return self.str_instr_to_byte("MEDIA_MUTE");
+		elif (command == "VOLUMEUP"): return self.str_instr_to_byte("MEDIA_VOLUME_INC");
+		elif (command == "VOLUMEDOWN"): return self.str_instr_to_byte("MEDIA_VOLUME_DEC");
+		elif (command == "SCROLLLOCK"): return self.str_instr_to_byte("SCROLL_LOCK");
+		elif (command == "NUMLOCK"): return self.str_instr_to_byte("NUM_LOCK");
+		elif (command == "CAPSLOCK"): return self.str_instr_to_byte("CAPS_LOCK");
 		else:
 			if command in self.keyboard_layout: self.add_bytes(self.code_to_bytes(command));
 			else:
@@ -357,64 +357,64 @@ class DuckyEncoder:
 						elif (op == "CONTROL" or op == "CTRL"):
 							if (len(command) > 1):
 								self.encoded_script.append(self.str_instr_to_byte(command));
-								self.encoded_script.append(self.str_instr_to_byte(self.keycode_map["MODIFIERKEY_CTRL"]));
+								self.encoded_script.append(self.str_instr_to_byte(self.keyboard_layout["MODIFIERKEY_CTRL"]));
 							else:
-								self.encoded_script.append(self.str_instr_to_byte(self.keycode_map["KEY_LEFT_CTRL"]));
+								self.encoded_script.append(self.str_instr_to_byte(self.keyboard_layout["KEY_LEFT_CTRL"]));
 								self.add_null();
 						elif (op == "ALT"):
 							if (len(command) > 1):
 								self.encoded_script.append(self.str_instr_to_byte(command))
-								self.encoded_script.append(self.str_instr_to_byte(self.keycode_map["MODIFIERKEY_ALT"]));
+								self.encoded_script.append(self.str_instr_to_byte(self.keyboard_layout["MODIFIERKEY_ALT"]));
 							else:
-								self.encoded_script.append(self.str_instr_to_byte(self.keycode_map["KEY_LEFT_ALT"]));
+								self.encoded_script.append(self.str_instr_to_byte(self.keyboard_layout["KEY_LEFT_ALT"]));
 								self.add_null();
 						elif (op == "SHIFT"):
 							if (len(command) > 1):
 								self.encoded_script.append(self.str_instr_to_byte(command));
-								self.encoded_script.append(self.str_instr_to_byte(self.keycode_map["MODIFIERKEY_SHIFT"]));
+								self.encoded_script.append(self.str_instr_to_byte(self.keyboard_layout["MODIFIERKEY_SHIFT"]));
 							else:
-								self.encoded_script.append(self.str_instr_to_byte(self.keycode_map["KEY_LEFT_SHIFT"]));
+								self.encoded_script.append(self.str_instr_to_byte(self.keyboard_layout["KEY_LEFT_SHIFT"]));
 								self.add_null();
 						elif (op == "CTRL-ALT"):
 							if (len(command) > 1):
 								self.encoded_script.append(self.str_instr_to_byte(command));
-								self.encoded_script.append(self.str_instr_to_byte(self.keycode_map["MODIFIERKEY_CTRL"]) | self.str_instr_to_byte(self.keycode_map["MODIFIERKEY_ALT"]));
+								self.encoded_script.append(self.str_instr_to_byte(self.keyboard_layout["MODIFIERKEY_CTRL"]) | self.str_instr_to_byte(self.keyboard_layout["MODIFIERKEY_ALT"]));
 							else: continue;
 						elif (op == "CTRL-SHIFT"):
 							if (len(command) > 1):
 								self.encoded_script.append(self.str_instr_to_byte(command));
-								self.encoded_script.append(self.str_instr_to_byte(self.keycode_map["MODIFIERKEY_CTRL"]) | self.str_instr_to_byte(self.keycode_map["MODIFIERKEY_SHIFT"]));
+								self.encoded_script.append(self.str_instr_to_byte(self.keyboard_layout["MODIFIERKEY_CTRL"]) | self.str_instr_to_byte(self.keyboard_layout["MODIFIERKEY_SHIFT"]));
 							else: continue;
 						elif (op == "COMMAND-OPTION"):
 							if (len(command) > 1):
 								self.encoded_script.append(self.str_instr_to_byte(command));
-								self.encoded_script.append(self.str_instr_to_byte(self.keycode_map["MODIFIERKEY_KEY_LEFT_GUI"]) | self.str_instr_to_byte(self.keycode_map["MODIFIERKEY_ALT"]));
+								self.encoded_script.append(self.str_instr_to_byte(self.keyboard_layout["MODIFIERKEY_KEY_LEFT_GUI"]) | self.str_instr_to_byte(self.keyboard_layout["MODIFIERKEY_ALT"]));
 							else: continue;
 						elif (op == "ALT-SHIFT"):
 							if (len(command) > 1):
 								self.encoded_script.append(self.str_instr_to_byte(command));
-								self.encoded_script.append(self.str_instr_to_byte(self.keycode_map["MODIFIERKEY_KEY_LEFT_ALT"]) | self.str_instr_to_byte(self.keycode_map["MODIFIERKEY_SHIFT"]));
+								self.encoded_script.append(self.str_instr_to_byte(self.keyboard_layout["MODIFIERKEY_KEY_LEFT_ALT"]) | self.str_instr_to_byte(self.keyboard_layout["MODIFIERKEY_SHIFT"]));
 							else:
-								self.encoded_script.append(self.str_instr_to_byte(self.keycode_map["KEY_LEFT_ALT"]));
-								self.encoded_script.append(self.str_instr_to_byte(self.keycode_map["MODIFIERKEY_LEFT_ALT"]) | self.str_instr_to_byte(self.keycode_map["MODIFIERKEY_SHIFT"]));
+								self.encoded_script.append(self.str_instr_to_byte(self.keyboard_layout["KEY_LEFT_ALT"]));
+								self.encoded_script.append(self.str_instr_to_byte(self.keyboard_layout["MODIFIERKEY_LEFT_ALT"]) | self.str_instr_to_byte(self.keyboard_layout["MODIFIERKEY_SHIFT"]));
 						elif (op == "ALT-TAB"):
 							if (len(command) == 1):
-								self.encoded_script.append(self.str_instr_to_byte(self.keycode_map["KEY_TAB"]));
-								self.encoded_script.append(self.str_instr_to_byte(self.keycode_map["MODIFIERKEY_LEFT_GUI"]));
+								self.encoded_script.append(self.str_instr_to_byte(self.keyboard_layout["KEY_TAB"]));
+								self.encoded_script.append(self.str_instr_to_byte(self.keyboard_layout["MODIFIERKEY_LEFT_GUI"]));
 							else: continue;
 						elif (op == "WINDOWS" or op == "GUI"):
 							if (len(command) > 1):
 								self.encoded_script.append(self.str_instr_to_byte(command));
-								self.encoded_script.append(self.str_instr_to_byte(self.keycode_map["MODIFIERKEY_LEFT_GUI"]));
+								self.encoded_script.append(self.str_instr_to_byte(self.keyboard_layout["MODIFIERKEY_GUI"]));
 							else: 
-								self.encoded_script.append(self.str_instr_to_byte(self.keycode_map["MODIFIERKEY_LEFT_GUI"]));
+								self.encoded_script.append(self.str_instr_to_byte(self.keyboard_layout["MODIFIERKEY_LEFT_GUI"]));
 								self.add_null();
 						elif (op == "COMMAND"):
 							if (len(command) > 1):
 								self.encoded_script.append(self.str_instr_to_byte(command));
-								self.encoded_script.append(self.str_instr_to_byte(self.keycode_map["MODIFIERKEY_LEFT_GUI"]));
+								self.encoded_script.append(self.str_instr_to_byte(self.keyboard_layout["MODIFIERKEY_LEFT_GUI"]));
 							else:
-								self.encoded_script.append(self.str_instr_to_byte(self.keycode_map["KEY_COMMAND"]));
+								self.encoded_script.append(self.str_instr_to_byte(self.keyboard_layout["KEY_COMMAND"]));
 								self.add_null();
 						else: self.encoded_script.append(self.str_instr_to_byte(comps[0].strip(" ")));
 						if (not default_delay and default_delay_value > 0): self.inject_delay(default_delay_value);
@@ -428,7 +428,7 @@ class DuckyEncoder:
 		else:
 			try:
 				with open(self.output_file, "wb") as fh: fh.write(self.encoded_script);
-			except Exception: print("Failed to write bin file..."); sys.exit(-4);
+			except Exception as ex: print("Failed to write bin file...{0}".format(ex)); sys.exit(-4);
 		print("Encoder finished without error.  Please copy inject.bin to Rubber Ducky.");
 	pass;
 
