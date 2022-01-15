@@ -51,8 +51,6 @@ class DuckyEncoder:
 				else: results.append(int("0x00", 16));
 		return results;
 	def str_to_byte(self, a): return int(a[2:], 16) if "0x" in a else int(a);
-
-	## wip
 	def str_instr_to_byte(self, command):
 		if "KEY_{0}".format(command) in self.keycode_map.keys(): 
 			return self.str_to_byte(self.keycode_map["KEY_{0}".format(command)]);
