@@ -18,7 +18,11 @@ while getopts "i:r:e:j:" option; do
 done
 
 if [ $JAR_MODE = 0 ]; then
+<<<<<<< HEAD
 	go run $BASE_PATH/tools/duckyencoder.go -l $BASE_PATH/duckencoder_maps.json -i $BASE_PATH/payloads/payload.txt -o $BASE_PATH/inject.bin
+=======
+	go run $BASE_PATH/tools/duckyencoder.go  -i $BASE_PATH/payloads/payload.txt -o $BASE_PATH/inject.bin
+>>>>>>> ad4a8fc9cef5de3ae77d36d605bd1e6f078f11b9
 elif [ $JAR_MODE = 2 ]; then
 	python3 $BASE_PATH/tools/duckencoder.py  -i $BASE_PATH/payloads/payload.txt -o $BASE_PATH/inject.bin
 else
