@@ -20,15 +20,16 @@ while getopts "p:k:" option; do
     esac
 done
 
-JAR_VALUE=$(java -jar $ROOT_PATH/tools/duckencoder.jar -i $BASE_PATH/payload.txt -o $BASE_PATH/inject_jar.bin > /dev/null; cat $BASE_PATH/inject_jar.bin)
-PYTHON_VALUE=$(python3 $ROOT_PATH/tools/duckencoder.py -i $BASE_PATH/payload.txt -o $BASE_PATH/inject_py.bin > /dev/null; cat $BASE_PATH/inject_py.bin)
-GO_VALUE=$(go run $ROOT_PATH/tools/duckyencoder.go -l $ROOT_PATH/tools/duckencoder_maps.json -i $BASE_PATH/payload.txt -o $BASE_PATH/inject_go.bin > /dev/null; cat $BASE_PATH/inject_go.bin)
+JAR_VALUE=$(java -jar $ROOT_PATH/tools/duckencoder.jar -i $BASE_PATH/payload.txt -o $BASE_PATH/inject_jar.bin > /dev/null; hexdump $BASE_PATH/inject_jar.bin)
+PYTHON_VALUE=$(python3 $ROOT_PATH/tools/duckencoder.py -i $BASE_PATH/payload.txt -o $BASE_PATH/inject_py.bin > /dev/null; hexdump $BASE_PATH/inject_py.bin)
+GO_VALUE=$(go run $ROOT_PATH/tools/duckyencoder.go -l $ROOT_PATH/tools/duckencoder_maps.json -i $BASE_PATH/payload.txt -o $BASE_PATH/inject_go.bin > /dev/null; hexdump $BASE_PATH/inject_go.bin)
 
 echo "JAR    : $JAR_VALUE"
 echo "PYTHON : $PYTHON_VALUE"
 echo "GO     : $GO_VALUE"
 
-if [ "$JAR_VALUE" = "$PYTHON_VALUE" ] && [ "$GO_VALUE" = "$PYTHON_VALUE" ]; then
+# && [ "$GO_VALUE" = "$PYTHON_VALUE" ]
+if [ "$JAR_VALUE" = "$PYTHON_VALUE" ]; then
 	echo "Same!"
 else
 	echo "Not the same..."
