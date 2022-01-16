@@ -28,8 +28,7 @@ echo "JAR    : $JAR_VALUE"
 echo "PYTHON : $PYTHON_VALUE"
 echo "GO     : $GO_VALUE"
 
-# && [ "$GO_VALUE" = "$PYTHON_VALUE" ]
-if [ "$JAR_VALUE" = "$PYTHON_VALUE" ]; then
+if [ "$JAR_VALUE" = "$PYTHON_VALUE" ] && [ "$GO_VALUE" = "$PYTHON_VALUE" ]; then
 	echo "Same!"
 else
 	echo "Not the same..."
