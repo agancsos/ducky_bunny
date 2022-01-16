@@ -5,6 +5,9 @@
 # Version      : v. 1.0.0.0                                                   #
 # Description  : Encodes a bin file for use with a USB Rubber Ducky.          #
 ###############################################################################
+## ^U^H^K^B^H^B^O^B^O^B^R^B,^@^P^B^R^B^W^B^W^B^R^B
+## ^U^H^K^B^H^B^@^@^@^@^@^@,^@^@^@^@^@^W^B^W^B^@^@^@^@
+## ^@^@^K^B^H^B^@^@^@^@^@^@,^@^@^@^@^@^W^B^W^B^@^@^@^@
 import os, sys, json;
 
 class DuckyEncoder:
@@ -22,7 +25,7 @@ class DuckyEncoder:
 		jobj = json.loads(raw_json);
 		self.keycode_map = jobj["keycode_map"] if "keycode_map" in jobj.keys() else {};
 		self.layout_map = jobj["layout_map"] if "layout_map" in jobj.keys() else {}
-	def add_null(self): self.encoded_script.append(0x00)
+	def add_null(self): self.encoded_script.append(int("0x00", 16))
 	def add_bytes(self, b):
 		for x in b: 
 			self.encoded_script.append(x);
@@ -31,18 +34,22 @@ class DuckyEncoder:
 		delay_value = delay;
 		while (delay_value != 0):
 			self.add_null();
-			if (delay_value > 255): self.encoded_script.append(int("0xFF", 16)); delay_value -= 255;
-			else: self.encoded_script.append(delay_value); delay_value = 0;
+			if (delay_value > 255): 
+				self.encoded_script.append(int("0xFF", 16)); 
+				delay_value -= 255;
+			else: 
+				self.encoded_script.append(delay_value); 
+				delay_value = 0;
 	def char_to_bytes(self, c): 
-		if ord(c) < 128: return self.code_to_bytes("ASCII_{0}".format(hex(ord(c))));
-		elif ord(c) < 256: return self.code_to_bytes("ISO_8859_1_{0}".format(hex(ord(c))));
-		else: return self.code_to_bytes("UNICODE_{0}".format(hex(ord(c))));
+		if ord(c) < 128: return self.code_to_bytes("ASCII_{0}".format(hex(ord(c)).upper()));
+		elif ord(c) < 256: return self.code_to_bytes("ISO_8859_1_{0}".format(hex(ord(c)).upper()));
+		else: return self.code_to_bytes("UNICODE_{0}".format(hex(ord(c)).upper()));
 	def code_to_bytes(self, a):
 		results = bytearray();
-		if a.replace("0x", "") not in self.layout_map.keys(): 
+		if a.replace("0X", "").upper() not in self.layout_map.keys(): 
 			results.append(int("0x00", 16));
 		else:
-			for b in self.layout_map[a.replace("0x", "")].split(","):
+			for b in self.layout_map[a.replace("0X", "").upper()].split(","):
 				key = b.strip();
 				if key in self.keycode_map.keys(): 
 					results.append(self.str_to_byte(self.keycode_map[key].strip()));
@@ -83,7 +90,8 @@ class DuckyEncoder:
 				while (line.strip() != ""):
 					comps = line.split(" ", 1);
 					if (comps[0] == "REM" or comps[0] == "LED" or comps[0] == "\n" or (repeat and comps[0] == "REPEAT") or  (len(comps) > 1 and comps[0][0:2] == "//")): 
-						line = fh.readline(); continue;					
+						line = fh.readline(); continue;		
+					if self.debug: print(line);			
 					if (comps[0] == "REPEAT"):
 						repeat_count = int(comps[1].strip());
 						comps = self.last_command.split(" ");
@@ -94,53 +102,56 @@ class DuckyEncoder:
 					command = comps[1].strip();
 					for i in range(0, repeat_count):
 						if (op == "DEFAULT_DELAY" or op == "DEFAULTDELAY"):
-							default_delay = False; default_delay_value = int(command);
+							default_delay = False; 
+							default_delay_value = int(command);
 						elif (op == "DELAY"):
-							default_delay = False; delay_value = int(command); self.inject_delay(delay_value);
+							delay_value = int(command); 
+							self.inject_delay(delay_value);
 						elif (op == "STRING"):
-							for c in comps[1]: self.add_bytes(self.char_to_bytes(c));
+							for c in comps[1].strip(): self.add_bytes(self.char_to_bytes(c));
 						elif (op == "STRING_DELAY"):
 							delay_value = int(comps[1]);
-							for c in comps[2]: self.add_bytes(self.char_to_bytes(c)); self.inject_delay(delay_value);
+							for c in comps[2]: self.add_bytes(self.char_to_bytes(c));
+							self.inject_delay(delay_value);
 						elif (op == "CONTROL" or op == "CTRL"):
 							if (len(comps) > 1):
-								self.encoded_script.append(self.str_instr_to_byte(comps));
+								self.encoded_script.append(self.str_instr_to_byte(comps[1]));
 								self.encoded_script.append(self.str_to_byte(self.keycode_map["MODIFIERKEY_CTRL"]));
 							else:
 								self.encoded_script.append(self.str_to_byte(self.keycode_map["KEY_LEFT_CTRL"]));
 								self.add_null();
 						elif (op == "ALT"):
 							if (len(comps) > 1):
-								self.encoded_script.append(self.str_instr_to_byte(comps))
+								self.encoded_script.append(self.str_instr_to_byte(comps[1]))
 								self.encoded_script.append(self.str_to_byte(self.keycode_map["MODIFIERKEY_ALT"]));
 							else:
 								self.encoded_script.append(self.str_to_byte(self.keycode_map["KEY_LEFT_ALT"]));
 								self.add_null();
 						elif (op == "SHIFT"):
 							if (len(comps) > 1):
-								self.encoded_script.append(self.str_instr_to_byte(comps));
+								self.encoded_script.append(self.str_instr_to_byte(comps[1]));
 								self.encoded_script.append(self.str_to_byte(self.keycode_map["MODIFIERKEY_SHIFT"]));
 							else:
 								self.encoded_script.append(self.str_to_byte(self.keycode_map["KEY_LEFT_SHIFT"]));
 								self.add_null();
 						elif (op == "CTRL-ALT"):
 							if (len(comps) > 1):
-								self.encoded_script.append(self.str_instr_to_byte(comps));
+								self.encoded_script.append(self.str_instr_to_byte(comps[1]));
 								self.encoded_script.append(self.str_to_byte(self.keycode_map["MODIFIERKEY_CTRL"]) | self.str_to_byte(self.keycode_map["MODIFIERKEY_ALT"]));
 							else: continue;
 						elif (op == "CTRL-SHIFT"):
 							if (len(comps) > 1):
-								self.encoded_script.append(self.str_instr_to_byte(comps));
+								self.encoded_script.append(self.str_instr_to_byte(comps[1]));
 								self.encoded_script.append(self.str_to_byte(self.keycode_map["MODIFIERKEY_CTRL"]) | self.str_to_byte(self.keycode_map["MODIFIERKEY_SHIFT"]));
 							else: continue;
 						elif (op == "COMMAND-OPTION"):
 							if (len(comps) > 1):
-								self.encoded_script.append(self.str_instr_to_byte(comps));
+								self.encoded_script.append(self.str_instr_to_byte(comps[1]));
 								self.encoded_script.append(self.str_to_byte(self.keycode_map["MODIFIERKEY_KEY_LEFT_GUI"]) | self.str_to_byte(self.keycode_map["MODIFIERKEY_ALT"]));
 							else: continue;
 						elif (op == "ALT-SHIFT"):
 							if (len(comps) > 1):
-								self.encoded_script.append(self.str_instr_to_byte(comps));
+								self.encoded_script.append(self.str_instr_to_byte(comps[1]));
 								self.encoded_script.append(self.str_to_byte(self.keycode_map["MODIFIERKEY_KEY_LEFT_ALT"]) | self.str_to_byte(self.keycode_map["MODIFIERKEY_SHIFT"]));
 							else:
 								self.encoded_script.append(self.str_to_byte(self.keycode_map["KEY_LEFT_ALT"]));
@@ -164,7 +175,9 @@ class DuckyEncoder:
 							else:
 								self.encoded_script.append(self.str_to_byte(self.keycode_map["KEY_COMMAND"]));
 								self.add_null();
-						else: self.encoded_script.append(self.str_instr_to_byte(comps[0].strip(" ")));
+						else: 
+							self.encoded_script.append(self.str_instr_to_byte(comps[0].strip(" ")));
+							self.add_null();
 						if (not default_delay and default_delay_value > 0): self.inject_delay(default_delay_value);
 					if not repeat: self.last_command = line;
 					line = fh.readline();
